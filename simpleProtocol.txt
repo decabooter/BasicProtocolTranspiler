@@ -1,0 +1,12 @@
+(plan "Big Stuff" "1.0"
+	(configuration
+		(liquid "water" aspSpeed=6 dispSpeed=6)
+		(labware plate96 "Prep Plate")
+		(labware reservoir "Vat" ["water"])
+	)
+	(protocol
+		(step 1
+			(transfer "Vat":1 "Prep Plate":A8 50)
+		)
+	)
+)
