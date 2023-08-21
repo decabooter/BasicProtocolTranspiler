@@ -61,8 +61,15 @@ EOF, RESWORD, LOCATION = (
     'INTEGER', 'EOF', 'RESWORD', 'LOCATION'
     )
 """
-RPAREN = 'EOTERM'
+DONE = 'DONE'
 RESWORD = 'RESWORD'
+PLAN = 'PLAN'
+CONFIG = 'CONFIG'
+LIQUID = 'LIQUID'
+LABWARE = 'LABWARE'
+PROTOCOL = 'PROTOCOL'
+STEP = 'STEP'
+TRANSFER = 'TRANSFER'
 STRING = 'STRING'
 INTEGER = 'INTEGER'
 LOCATION = 'LOCATION'
@@ -171,11 +178,22 @@ class Lexer(object):
                 continue
             
             if self.current_char == '(':
-                return Token(RESWORD, self.reservedWord())
+                matchValue = self.reservedWord()
+                match matchValue:
+                    case 'plan': tokenType = PLAN
+                    case 'configuration': tokenType = CONFIG
+                    case 'liquid' : tokenType = LIQUID
+                    case 'labware' : tokenType = LABWARE
+                    case 'protocol' : tokenType = PROTOCOL
+                    case 'step' : tokenType = STEP
+                    case 'transfer' : tokenType = TRANSFER
+                    case _ : tokenType = RESWORD
+                                      
+                return Token(tokenType, matchValue)
             
             if self.current_char == ')':
                 self.advance()
-                return Token(RPAREN, ')')
+                return Token(DONE, ')')
             
             if self.current_char == '"':
                 return Token(STRING, self.getString())
@@ -200,10 +218,53 @@ class AST(object):
     pass
 
 class Plan(AST):
-    def __init(self, token, children):
+    def __init__(self, name, version, config, protocol):
+        self.value = planToken.value
+        self.name = name
+        self.version = version
+        self.config = config
+        self.protocol = protocol
+        
+class Configuration(AST):
+    def __init__(self):
+        self.declarationList = []
+        
+class Liquid(AST):
+    def __init__(self, liquidName):
+        self.liquidName = liquidName
+        self.argList = []
+        
+class Labware(AST):
+    def __init__(self, token, labwareName):
+        self.token = token
+        self.labwareName = labwareName
+        self.initVolumes = []
+        
+class Protocol(AST):
+    def __init__(self, token):
+        self.token = token
+        self.stepList = []
+        
+class Step(AST):
+    def __init__(self, token):
+        self.token = token
+        self.stepActionList = []
+        
+class StepAction(AST):
+    def __init__(self, token, srcLabware, srcLoc, destLabware, destLoc):
+        self.token = token
+        self.sourceLabware = srcLabware
+        self.sourceLocation = srcLoc
+        self.destinationLabware = destLabware
+        self.destinationLocation = destLoc
+        
+class Variable(AST):
+    def __init__(self, token):
         self.token = token
         self.value = token.value
-        self.children = []
+        
+class NoOp(AST):
+    pass
 
 class Parser(object):
     def __init__(self, lexer):
@@ -217,7 +278,58 @@ class Parser(object):
         #Note:  I don't use the token_type, so can probably trim this out
         #but...it could be a way to add another layer of checks in if I wanted
         #to have a more "rigid" parsing approach
-        self.current_token = self.lexer.get_next_token()
+        #if self.current_token.type == token_type:
+            self.current_token = self.lexer.get_next_token()
+        #else:
+        #    self.error()
+    
+    def plan(self):
+        self.eat(PLAN)
+        planName = self.variable()
+        version = self.variable()
+        configuration = self.configuration()
+        protocol = self.protocol()
+        node = Plan(planName, version, configuration, protocol)
+        return node
+    
+    def configuration(self):
+        self.eat(CONFIG)
+        declarations = self.declList()
+        root = Configuration()
+        for declaration in declarations:
+            root.declarationList.append(declarations)
+        return root
+        
+    def declList (self):
+        node = self.decl()
+        results = [node]
+        while self.current_token.type != DONE:
+            results.append(self.decl())
+        return results
+    
+    def decl(self):
+        if self.current_token_type == LIQUID:
+            node = self.liquid()
+        elif self.current_token_type == LABWARE:
+            node = self.labware()
+        return node
+    
+    def liquid(self):
+        self.eat(LIQUID)
+        liquidName = self.variable()
+        
+    
+    def variable(self):
+        node = Variable(self.current_token)
+        if node.token == STRING:
+            self.eat(STRING)
+        elif node.token == INTEGER:
+            self.eat(INTEGER)
+            
+    def empty(self):
+        """An empty production"""
+        return NoOp()
+        
         
     
 

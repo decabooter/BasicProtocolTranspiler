@@ -1,0 +1,59 @@
+plan : '(' 'plan' plan-name plan-version configuration body ')'
+
+plan-name : '"' string '"'
+
+plan-version : '"' string '"'
+
+configuration : '(' 'configuration' decl-list ')'
+
+decl-list : decl | decl decl-list
+
+decl : liquid | labware
+
+liquid : '(' 'liquid' liquid-name arg-list ')'
+
+liquid-name : '"' string '"'
+
+arg-list : {argument}
+
+argument : arg-name=arg-value
+
+arg-name = 'aspSpeed' | 'dispSpeed'
+
+arg-value = string
+
+labware : '(' labware-type labware-name init-volumes ')'
+
+labware-type : string
+
+labware-name : '"' string '"'
+
+init-volumes : '[' init-vol-list ']'
+
+init-vol-list : init-vol | init-vol ',' init-vol-list
+
+body : '(' 'protocol' step-list ')'
+
+step-list : step | step step-list
+
+step : '(' step-id step-action-list ')'
+
+step-id : step&&step-num
+
+step-num : integer
+
+step-action-list : step-action | step-action step-action-list
+
+step-action : '(' action source-labware:source-well dest-labware:dest-well volume ')'
+
+action : transfer | mix
+
+source-labware : labware-name
+
+dest-labware : labware-name
+
+source-well : string
+
+dest-well : string
+
+volume : integer
