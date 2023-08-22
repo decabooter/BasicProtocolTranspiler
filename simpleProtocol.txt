@@ -1,8 +1,9 @@
 (plan "Big Stuff" "1.0"
 	(configuration
 		(liquid "water" aspSpeed=6 dispSpeed=6)
-		(labware plate96 "Prep Plate")
-		(labware reservoir "Vat" ["water"])
+		(liquid "mud" aspSpeed=2 dispSpeed=4)
+		(labware "Prep Plate" ["sample 1" "sample 2"] lwType=plate96)
+		(labware "Vat" ["water"] lwType=reservoir)
 	)
 	(protocol
 		(step 1

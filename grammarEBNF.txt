@@ -20,11 +20,13 @@ argument : arg-name=arg-value
 
 arg-name = 'aspSpeed' | 'dispSpeed'
 
-arg-value = string
+arg-value = string | integer
 
 labware : '(' labware-type labware-name init-volumes ')'
 
-labware-type : string
+labware-type : labware-arg=arg-value
+
+labware-arg : 'lwType'
 
 labware-name : '"' string '"'
 
