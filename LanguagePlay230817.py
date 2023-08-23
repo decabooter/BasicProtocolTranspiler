@@ -52,10 +52,21 @@ class Interpreter(NodeVisitor):
         CSVVersion = 7
         NumSteps = 0
         planCSV = str(CSVVersion) + "," + str(NumSteps) + ",,,,,,,,,,\n"
+        self.visit(node.config)
+        self.visit(node.protocol)
         return planCSV
+    
+    def visit_Configuration(self, node):
+        print("Got to Configuration")
+        
+    def visit_Protocol(self, node):
+        print("Got to Protocol")
     
     def interpret(self):
         tree = self.parser.parse()
+        print("####################")
+        print("Done with the parser")
+        print("####################")
         return self.visit(tree)
 
 ###############
