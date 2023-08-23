@@ -22,7 +22,7 @@ arg-name = 'aspSpeed' | 'dispSpeed'
 
 arg-value = string | integer
 
-labware : '(' labware-type labware-name init-volumes ')'
+labware : '(' labware-name init-volumes  labware-type')'
 
 labware-type : labware-arg=arg-value
 
@@ -46,7 +46,7 @@ step-num : integer
 
 step-action-list : step-action | step-action step-action-list
 
-step-action : '(' action source-labware:source-well dest-labware:dest-well volume ')'
+step-action : '(' action source-labware:source-location dest-labware:dest-location volume ')'
 
 action : transfer | mix
 
@@ -54,8 +54,8 @@ source-labware : labware-name
 
 dest-labware : labware-name
 
-source-well : string
+source-location : string
 
-dest-well : string
+dest-location : string
 
 volume : integer

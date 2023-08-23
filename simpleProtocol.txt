@@ -8,6 +8,11 @@
 	(protocol
 		(step 1
 			(transfer "Vat":1 "Prep Plate":A8 50)
+			(transfer "Vat":1 "Prep Plate":B4 75)
+		)
+		(step 2
+			(transfer "Prep Plate":A1 "Prep Plate":C4 50)
+			(transfer "Prep Plate":A1 "Prep Plate":B4 75)
 		)
 	)
 )
