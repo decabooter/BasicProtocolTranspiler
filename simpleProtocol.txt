@@ -2,6 +2,8 @@
 	(configuration
 		(liquid "water" aspSpeed=6 dispSpeed=6)
 		(liquid "mud" aspSpeed=2 dispSpeed=4)
+		(liquid "sample 1" aspSpeed=4 dispSpeed=4)
+		(liquid "sample 2" aspSpeed=4 dispSpeed=4)
 		(labware "Prep Plate" ["sample 1" "sample 2"] lwType=plate96)
 		(labware "Vat" ["water"] lwType=reservoir)
 	)

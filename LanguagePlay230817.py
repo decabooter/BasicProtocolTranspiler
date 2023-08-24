@@ -12,7 +12,7 @@ import sys
 import re
 import ProtocolLexer as lex
 import ProtocolParser as par
-import SymbolBed as bed
+import SymbolBed as bench
 import Constants
 
 
@@ -55,6 +55,8 @@ class Interpreter(NodeVisitor):
     def visit_Configuration(self, node):
         for declaration in node.declarationList:
             self.visit(declaration)
+        print (bench.LIQUIDS)
+        print (bench.BED)
         
     def visit_Liquid(self, node):
         liquidName = self.visit(node.liquidName)
@@ -62,9 +64,12 @@ class Interpreter(NodeVisitor):
         for arg in node.argList:
             argument = self.visit(arg)
             argList[argument[0]] = argument[1]
-        bed.LIQUIDS[liquidName] = argList
-        print(bed.LIQUIDS)
+        bench.LIQUIDS[liquidName] = argList
         
+    #Labware Visitor
+    #This visitor reads in the labware information, initializes any wells with defined liquids
+    #Checks are done to ensure the liquids have already been defined.
+    #Labware is then added to the "symbolic benchtop"
     def visit_Labware(self, node):
         labwareName = self.visit(node.labwareName)
         labwareModel = 'reservoir'
@@ -75,12 +80,20 @@ class Interpreter(NodeVisitor):
                 labwareModel = argument[1]
             else:
                 argList[argument[0]] = argument [1]
-        labware = bed.Labware(labwareName, labwareModel)
+        labware = bench.Labware(labwareName, labwareModel)
         labware.initWells(labwareModel)
-        initVolumes = {}
-        for initVolume in node.initVolumes:
-            initValue = self.visit(initVolume)
-        
+        lwDims = labware.wells.shape
+        for count,initVolume in enumerate(node.initVolumes):
+            if count < labware.wells.size//2: #Kludge: taking out the 3rd dimension in calculation of array size
+                val = bench.LIQUIDS.get(initVolume.value)
+                if val is None:
+                    raise Exception('Liquid not defined:', initVolume.value)
+                else:
+                    labware.wells[count%lwDims[0], count//lwDims[0], 0] = initVolume.value
+            else:
+                raise Exception('Initial volume assignment out of range.  Expected: ',
+                                labware.wells.size//2, ' Actual: ', count+1)
+        bench.BED[labwareName] = labware
         
     def visit_Protocol(self, node):
         print("Got to Protocol")
