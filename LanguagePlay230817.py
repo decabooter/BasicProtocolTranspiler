@@ -13,13 +13,7 @@ import re
 import ProtocolLexer as lex
 import ProtocolParser as par
 
-inFile = sys.argv[1] if len(sys.argv) >= 2 else 'simpleProtocol.txt'
 
-with open (inFile) as protocolFile:
-#    lines = protocolFile.readlines()
-    fileText = protocolFile.read()
-    
-print(fileText)
 
 
 #######################
@@ -44,6 +38,9 @@ class NodeVisitor(object):
 # This class inherits from NodeVisitor to do all of the specific stuff for our
 # specific language
 class Interpreter(NodeVisitor):
+    LIQUIDS = {}
+    LABWARE = {}
+    
     def __init__(self, parser):
         self.parser = parser
         
@@ -57,10 +54,32 @@ class Interpreter(NodeVisitor):
         return planCSV
     
     def visit_Configuration(self, node):
-        print("Got to Configuration")
+        for declaration in node.declarationList:
+            self.visit(declaration)
+        
+    def visit_Liquid(self, node):
+        liquidName = self.visit(node.liquidName)
+        argList = {}
+        for arg in node.argList:
+            argument = self.visit(arg)
+            argList[argument[0]] = argument[1]
+        self.LIQUIDS[liquidName] = argList
+        print(self.LIQUIDS)
+        
+    def visit_Labware(self, node):
+        print("Got to Labware")
         
     def visit_Protocol(self, node):
         print("Got to Protocol")
+        
+    def visit_Assign(self,node):
+        print(node.arg.value, '=', node.assignment.value)
+        assignment = [node.arg.value, node.assignment.value]
+        return assignment
+    
+    def visit_Variable(self, node):
+        print("Variable", node.value)
+        return node.value
     
     def interpret(self):
         tree = self.parser.parse()
@@ -76,6 +95,14 @@ class Interpreter(NodeVisitor):
 ###############
 
 def main():
+    inFile = sys.argv[1] if len(sys.argv) >= 2 else 'simpleProtocol.txt'
+
+    with open (inFile) as protocolFile:
+    #    lines = protocolFile.readlines()
+        fileText = protocolFile.read()
+        
+    print(fileText)
+    
     lexer = lex.Lexer(fileText)
     lexerList = lex.LexerLister(lexer)
     result = lexerList.expr()
