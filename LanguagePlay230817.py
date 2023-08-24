@@ -12,7 +12,8 @@ import sys
 import re
 import ProtocolLexer as lex
 import ProtocolParser as par
-
+import SymbolBed as bed
+import Constants
 
 
 
@@ -38,8 +39,6 @@ class NodeVisitor(object):
 # This class inherits from NodeVisitor to do all of the specific stuff for our
 # specific language
 class Interpreter(NodeVisitor):
-    LIQUIDS = {}
-    LABWARE = {}
     
     def __init__(self, parser):
         self.parser = parser
@@ -63,11 +62,25 @@ class Interpreter(NodeVisitor):
         for arg in node.argList:
             argument = self.visit(arg)
             argList[argument[0]] = argument[1]
-        self.LIQUIDS[liquidName] = argList
-        print(self.LIQUIDS)
+        bed.LIQUIDS[liquidName] = argList
+        print(bed.LIQUIDS)
         
     def visit_Labware(self, node):
-        print("Got to Labware")
+        labwareName = self.visit(node.labwareName)
+        labwareModel = 'reservoir'
+        argList = {}
+        for arg in node.argList:
+            argument = self.visit(arg)
+            if argument[0] == 'LWTYPE':
+                labwareModel = argument[1]
+            else:
+                argList[argument[0]] = argument [1]
+        labware = bed.Labware(labwareName, labwareModel)
+        labware.initWells(labwareModel)
+        initVolumes = {}
+        for initVolume in node.initVolumes:
+            initValue = self.visit(initVolume)
+        
         
     def visit_Protocol(self, node):
         print("Got to Protocol")
