@@ -93,7 +93,7 @@ class SymbolBuilder(NodeVisitor):
     def visit_Step(self, node):
         step = bench.ProtocolStep(self.visit(node.stepID))
         for stepAction in node.stepActionList:
-            step.actionList.append(self.visit(stepAction))       
+            step.actionList.append(self.visit(stepAction))    
         return step
             
     def visit_StepAction(self, node):
@@ -113,7 +113,6 @@ class SymbolBuilder(NodeVisitor):
         stepAction = bench.ProtocolAction(action, sourceLabware, sourceLocation,
                                           destinationLabware, destinationLocation,
                                           volume)
-        print(stepAction)
         return stepAction
         
     def visit_Assign(self,node):

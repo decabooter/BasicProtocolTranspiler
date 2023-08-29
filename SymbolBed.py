@@ -66,13 +66,11 @@ class ProtocolStep(object):
         self.actionList = []
         
     def __str__(self):
-        print(self.stepID)
         stepPrint = "Step {stepNum}:\n".format(
             stepNum = str(self.stepID))
-        for action in self.actionList:
-            print("banana")
+        for count, action in enumerate(self.actionList):
             stepPrint += repr(action)
-        print ("I'm here ", stepPrint)
+        return stepPrint
     
     def __repr__(self):
         return self.__str__()
